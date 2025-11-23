@@ -1,4 +1,8 @@
 {
+  "imports": {
+    "yjs": "npm:yjs@13.6.27",
+    "serveDir": "https://deno.land/std@0.224.0/http/file_server.ts"
+  },
   "tasks": {
     "start": "deno run --allow-env --allow-net --allow-read --allow-write main.ts",
     "build": "deno compile --allow-env --allow-net --allow-read --allow-write main.ts"

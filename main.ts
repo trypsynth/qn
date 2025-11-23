@@ -1,5 +1,5 @@
-import { serveDir } from "https://deno.land/std@0.220.1/http/file_server.ts";
-import * as Y from "npm:yjs";
+import { serveDir } from "serveDir";
+import * as Y from "yjs";
 
 const PORT = 8000;
 const SAVE_FILE = "yjs_state.bin";
@@ -10,7 +10,9 @@ const connections = new Set<WebSocket>();
 try {
   const saved = await Deno.readFile(SAVE_FILE);
   Y.applyUpdate(doc, saved);
-} catch (_) {}
+} catch (_) {
+  // This just means no note has been created yet, we don't care.
+}
 
 doc.on("update", async (update: Uint8Array, origin) => {
   for (const socket of connections) {
