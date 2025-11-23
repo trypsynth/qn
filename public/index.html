@@ -28,7 +28,9 @@
 
       const setStatus = (connected) => {
         noteEl.disabled = !connected;
-        document.title = connected ? "Quicknotes" : "Quicknotes (disconnected)";
+        document.title = connected
+          ? "Quicknotes"
+          : "Quicknotes (disconnected)";
       };
       setStatus(false);
 
