@@ -18,6 +18,7 @@
       if (!(noteEl instanceof HTMLTextAreaElement)) {
         throw new Error("Textarea not found");
       }
+      noteEl.focus();
       const doc = new Y.Doc();
       const ytext = doc.getText("note");
       const wsProtocol = location.protocol === "https:" ? "wss" : "ws";
