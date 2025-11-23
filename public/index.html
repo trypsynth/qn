@@ -12,7 +12,6 @@
 
     <script type="module">
       import * as Y from "https://cdn.jsdelivr.net/npm/yjs@13.6.13/+esm";
-      import { simpleDiff } from "https://cdn.jsdelivr.net/npm/lib0@0.2.88/diff/+esm";
 
       const noteEl = document.getElementById("note");
       if (!(noteEl instanceof HTMLTextAreaElement)) {
@@ -22,10 +21,20 @@
       const doc = new Y.Doc();
       const ytext = doc.getText("note");
       const wsProtocol = location.protocol === "https:" ? "wss" : "ws";
-      const ws = new WebSocket(
-        `${wsProtocol}://${location.host}/qn/ws`,
-      );
+      const wsUrl = new URL("./ws", location.href);
+      wsUrl.protocol = `${wsProtocol}:`;
+      const ws = new WebSocket(wsUrl);
       ws.binaryType = "arraybuffer";
+
+      const setStatus = (connected) => {
+        noteEl.disabled = !connected;
+        document.title = connected ? "Quicknotes" : "Quicknotes (disconnected)";
+      };
+      setStatus(false);
+
+      ws.addEventListener("open", () => setStatus(true));
+      ws.addEventListener("close", () => setStatus(false));
+      ws.addEventListener("error", () => setStatus(false));
 
       ws.addEventListener("message", (event) => {
         const update = new Uint8Array(event.data);
@@ -57,13 +66,8 @@
 
       noteEl.addEventListener("input", () => {
         doc.transact(() => {
-          const diff = simpleDiff(ytext.toString(), noteEl.value);
-          if (diff.remove > 0) {
-            ytext.delete(diff.index, diff.remove);
-          }
-          if (diff.insert.length > 0) {
-            ytext.insert(diff.index, diff.insert);
-          }
+          ytext.delete(0, ytext.length);
+          ytext.insert(0, noteEl.value);
         }, "local");
       });
     </script>
