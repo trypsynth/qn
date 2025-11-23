@@ -21,7 +21,7 @@
 			const doc = new Y.Doc();
 			const ytext = doc.getText("note");
 			const wsProtocol = location.protocol === "https:" ? "wss" : "ws";
-			const ws = new WebSocket(`${wsProtocol}://${location.host}/ws`);
+			const ws = new WebSocket(`${wsProtocol}://${location.host}/qn/ws`);
 			ws.binaryType = "arraybuffer";
 
 			ws.addEventListener("message", (event) => {
