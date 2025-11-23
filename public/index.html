@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Quicknotes</title>
+	</head>
+	<body>
+		<main>
+			<textarea id="note" placeholder="Start typing..."></textarea>
+		</main>
+
+		<script type="module">
+			import * as Y from "https://cdn.jsdelivr.net/npm/yjs@13.6.13/+esm";
+			import { simpleDiff } from "https://cdn.jsdelivr.net/npm/lib0@0.2.88/diff/+esm";
+
+			const noteEl = document.getElementById("note");
+			if (!(noteEl instanceof HTMLTextAreaElement)) {
+				throw new Error("Textarea not found");
+			}
+			const doc = new Y.Doc();
+			const ytext = doc.getText("note");
+			const wsProtocol = location.protocol === "https:" ? "wss" : "ws";
+			const ws = new WebSocket(`${wsProtocol}://${location.host}/ws`);
+			ws.binaryType = "arraybuffer";
+
+			ws.addEventListener("message", (event) => {
+				const update = new Uint8Array(event.data);
+				Y.applyUpdate(doc, update, "remote");
+			});
+
+			doc.on("update", (update, origin) => {
+				if (origin === "remote") {
+					return;
+				}
+				if (ws.readyState === WebSocket.OPEN) {
+					ws.send(update);
+				}
+			});
+
+			const clampSelection = (value, pos) => Math.max(0, Math.min(value.length, pos));
+
+			ytext.observe(() => {
+				const newValue = ytext.toString();
+				if (noteEl.value === newValue) {
+					return;
+				}
+				const start = clampSelection(newValue, noteEl.selectionStart);
+				const end = clampSelection(newValue, noteEl.selectionEnd);
+				noteEl.value = newValue;
+				noteEl.setSelectionRange(start, end);
+			});
+
+			noteEl.addEventListener("input", () => {
+				doc.transact(() => {
+					const diff = simpleDiff(ytext.toString(), noteEl.value);
+					if (diff.remove > 0) {
+						ytext.delete(diff.index, diff.remove);
+					}
+					if (diff.insert.length > 0) {
+						ytext.insert(diff.index, diff.insert);
+					}
+				}, "local");
+			});
+		</script>
+	</body>
+</html>
