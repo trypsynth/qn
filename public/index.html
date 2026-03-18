@@ -4,6 +4,54 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Quicknotes</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        height: 100vh;
+        background: #ffffff;
+        color: #000000;
+      }
+
+      main {
+        height: 100%;
+        display: flex;
+      }
+
+      #note {
+        flex: 1;
+        border: none;
+        outline: none;
+        resize: none;
+        font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        font-size: 14px;
+        line-height: 1.5;
+        padding: 20px;
+        background: #ffffff;
+        color: #000000;
+      }
+
+      #note:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: #1e1e1e;
+          color: #d4d4d4;
+        }
+
+        #note {
+          background: #1e1e1e;
+          color: #d4d4d4;
+        }
+      }
+    </style>
   </head>
   <body>
     <main>
